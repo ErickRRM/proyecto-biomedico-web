@@ -7,22 +7,18 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Login — máximo 5 intentos por minuto por IP
-     */
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('codigo_acceso', $request->codigo_acceso)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Las credenciales no son correctas.'],
+                'codigo_acceso' => ['El código de acceso o la contraseña son incorrectos.'],
             ]);
         }
 
@@ -32,28 +28,22 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Registra último acceso
         $user->update(['ultimo_acceso' => now()]);
-
-        // Revoca tokens anteriores del mismo dispositivo
         $user->tokens()->where('name', 'auth_token')->delete();
-
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
             'user'  => [
-                'id'     => $user->id,
-                'nombre' => $user->name,
-                'email'  => $user->email,
-                'rol'    => $user->getRoleNames()->first(),
+                'id'            => $user->id,
+                'codigo_acceso' => $user->codigo_acceso,
+                'nombre'        => $user->name,
+                'email'         => $user->email,
+                'rol'           => $user->getRoleNames()->first(),
             ],
         ]);
     }
 
-    /**
-     * Logout — revoca el token actual
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -63,18 +53,16 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Devuelve el usuario autenticado actual
-     */
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
 
         return response()->json([
-            'id'     => $user->id,
-            'nombre' => $user->name,
-            'email'  => $user->email,
-            'rol'    => $user->getRoleNames()->first(),
+            'id'            => $user->id,
+            'codigo_acceso' => $user->codigo_acceso,
+            'nombre'        => $user->name,
+            'email'         => $user->email,
+            'rol'           => $user->getRoleNames()->first(),
         ]);
     }
 }

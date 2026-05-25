@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'codigo_acceso',
         'password',
         'activo',
         'ultimo_acceso',
@@ -33,5 +34,18 @@ class User extends Authenticatable
             'activo'            => 'boolean',
             'password'          => 'hashed',
         ];
+    }
+
+    // Genera el siguiente código BIO-XXXX
+    public static function generarCodigoAcceso(): string
+    {
+        $ultimo = self::whereNotNull('codigo_acceso')
+            ->orderByDesc('id')
+            ->value('codigo_acceso');
+
+        if (!$ultimo) return 'BIO-0001';
+
+        $numero = (int) str_replace('BIO-', '', $ultimo);
+        return 'BIO-' . str_pad($numero + 1, 4, '0', STR_PAD_LEFT);
     }
 }

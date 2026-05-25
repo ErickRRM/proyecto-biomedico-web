@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 export default function Login() {
   const { login }               = useAuth()
   const navigate                = useNavigate()
-  const [email, setEmail]       = useState('')
+  const [codigoAcceso, setCodigoAcceso] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
@@ -16,7 +16,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const user = await login(email, password)
+      const user = await login(codigoAcceso, password)
       if (user.rol === 'admin')   navigate('/dashboard')
       if (user.rol === 'tecnico') navigate('/dashboard')
       if (user.rol === 'viewer')  navigate('/dashboard')
@@ -82,22 +82,22 @@ export default function Login() {
 
             {/* Correo */}
             <div style={s.field}>
-              <label style={s.label}>Correo electrónico</label>
+            <label style={s.label}>Código de acceso</label>
               <div style={s.inputWrap}>
-                <svg style={s.ico} viewBox="0 0 20 20" fill="none">
-                  <path d="M2 5.5A1.5 1.5 0 013.5 4h13A1.5 1.5 0 0118 5.5v9A1.5 1.5 0 0116.5 16h-13A1.5 1.5 0 012 14.5v-9z" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M2 6l8 5 8-5" stroke="currentColor" strokeWidth="1.3"/>
-                </svg>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="usuario@hospital.mx"
-                  required
-                  autoComplete="email"
-                  style={{ ...s.input, paddingLeft: '2.4rem' }}
-                />
-              </div>
+              <svg style={s.ico} viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="8" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3"/>
+                <path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.3"/>
+              </svg>
+              <input
+                type="text"
+                value={codigoAcceso}
+                onChange={e => setCodigoAcceso(e.target.value.toUpperCase())}
+                placeholder="BIO-0001"
+                required
+                autoComplete="username"
+                style={{ ...s.input, paddingLeft: '2.4rem', letterSpacing: '0.05em' }}
+              />
+             </div>
             </div>
 
             {/* Contraseña */}
